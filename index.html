@@ -1,0 +1,1824 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AI社工个案咨询辅助助手是一款面向一线社工与社区服务人员的轻量化智能工具，帮助快速整理个案信息、梳理服务流程，并提供政策解读、心理支持话术参考和资源对接指引。">
+  <title>AI社工个案咨询辅助助手 | 社区服务工作台</title>
+  <style>
+    :root {
+      --bg: #f6f7f4;
+      --panel: #ffffff;
+      --panel-soft: #f9faf7;
+      --ink: #20231f;
+      --muted: #687064;
+      --line: #dfe4da;
+      --teal: #1d7467;
+      --teal-dark: #13584e;
+      --amber: #b96f15;
+      --red: #b84237;
+      --green: #4f7f39;
+      --focus: #98c8bd;
+      --shadow: 0 18px 45px rgba(31, 38, 30, 0.08);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(246, 247, 244, 0.98)),
+        repeating-linear-gradient(90deg, rgba(29, 116, 103, 0.035) 0 1px, transparent 1px 48px),
+        var(--bg);
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+    }
+
+    .side-panel {
+      border-right: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 24px;
+      overflow: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent 48%),
+        var(--teal);
+      box-shadow: 0 10px 18px rgba(29, 116, 103, 0.2);
+      flex: 0 0 auto;
+      position: relative;
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      border: 2px solid white;
+      border-radius: 6px;
+    }
+
+    .brand-mark::before {
+      width: 19px;
+      height: 24px;
+      left: 10px;
+      top: 9px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .brand-mark::after {
+      width: 10px;
+      height: 14px;
+      right: 9px;
+      bottom: 8px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .form-section {
+      margin-top: 22px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+
+    .section-kicker {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: #384037;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    input,
+    select {
+      height: 40px;
+      padding: 0 11px;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+      padding: 10px 11px;
+      line-height: 1.55;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(152, 200, 189, 0.32);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 42px 42px;
+      gap: 10px;
+      margin-top: 18px;
+      position: sticky;
+      bottom: 0;
+      padding-top: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), #fff 36%);
+    }
+
+    .primary-btn,
+    .ghost-btn,
+    .icon-btn,
+    .copy-btn,
+    .chip {
+      min-height: 40px;
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .primary-btn {
+      background: var(--teal);
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 12px 22px rgba(29, 116, 103, 0.22);
+    }
+
+    .primary-btn:hover {
+      background: var(--teal-dark);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn,
+    .ghost-btn,
+    .copy-btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .icon-btn:hover,
+    .ghost-btn:hover,
+    .copy-btn:hover {
+      background: var(--panel-soft);
+      transform: translateY(-1px);
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .icon.spark::before,
+    .icon.spark::after {
+      content: "";
+      position: absolute;
+      inset: 2px 7px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .icon.spark::after {
+      transform: rotate(90deg);
+    }
+
+    .icon.refresh::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border: 2px solid currentColor;
+      border-left-color: transparent;
+      border-radius: 50%;
+    }
+
+    .icon.refresh::after {
+      content: "";
+      position: absolute;
+      right: 1px;
+      top: 1px;
+      border-left: 5px solid currentColor;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      transform: rotate(34deg);
+    }
+
+    .icon.sample::before {
+      content: "";
+      position: absolute;
+      inset: 2px 3px;
+      border: 2px solid currentColor;
+      border-radius: 3px;
+    }
+
+    .icon.sample::after {
+      content: "";
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: 6px;
+      height: 2px;
+      background: currentColor;
+      box-shadow: 0 4px 0 currentColor;
+    }
+
+    .icon.copy::before,
+    .icon.copy::after {
+      content: "";
+      position: absolute;
+      border: 2px solid currentColor;
+      border-radius: 3px;
+    }
+
+    .icon.copy::before {
+      width: 9px;
+      height: 11px;
+      right: 2px;
+      top: 2px;
+      background: #fff;
+    }
+
+    .icon.copy::after {
+      width: 9px;
+      height: 11px;
+      left: 2px;
+      bottom: 2px;
+      opacity: 0.62;
+    }
+
+    .icon.warn::before {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 2px;
+      width: 10px;
+      height: 10px;
+      border-left: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+    }
+
+    .main-panel {
+      padding: 26px 30px 34px;
+      overflow: auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .status-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      color: #3e463b;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .view-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      min-height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+      color: #3f473e;
+      font-weight: 700;
+    }
+
+    .tab-btn.active {
+      background: #193f39;
+      color: #fff;
+      border-color: #193f39;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(310px, 0.9fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .output-column,
+    .helper-column {
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.93);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-soft);
+    }
+
+    .card-header h3 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .copy-btn {
+      min-height: 32px;
+      padding: 0 10px;
+      color: #405047;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .card-body {
+      padding: 15px 16px 17px;
+      line-height: 1.72;
+      font-size: 14px;
+    }
+
+    .draft-block {
+      white-space: pre-wrap;
+    }
+
+    .empty-state {
+      min-height: 350px;
+      display: grid;
+      place-items: center;
+      padding: 38px 26px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-visual {
+      width: min(100%, 330px);
+      aspect-ratio: 16 / 9;
+      margin: 0 auto 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, transparent 0 16%, rgba(29, 116, 103, 0.12) 16% 17%, transparent 17% 49%, rgba(185, 111, 21, 0.14) 49% 50%, transparent 50% 82%, rgba(184, 66, 55, 0.12) 82% 83%, transparent 83%),
+        linear-gradient(180deg, rgba(29, 116, 103, 0.08), transparent),
+        #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .empty-visual::before {
+      content: "";
+      position: absolute;
+      width: 68%;
+      height: 2px;
+      left: 16%;
+      top: 50%;
+      background: #c8d3c4;
+    }
+
+    .empty-visual span {
+      position: absolute;
+      top: 50%;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 8px 18px rgba(31, 38, 30, 0.14);
+      transform: translate(-50%, -50%);
+    }
+
+    .empty-visual span:nth-child(1) {
+      left: 16%;
+      background: var(--teal);
+    }
+
+    .empty-visual span:nth-child(2) {
+      left: 50%;
+      background: var(--amber);
+    }
+
+    .empty-visual span:nth-child(3) {
+      left: 83%;
+      background: var(--red);
+    }
+
+    .empty-state h2 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .note {
+      border-left: 4px solid var(--amber);
+      background: #fff8ed;
+      color: #67420d;
+      padding: 12px 13px;
+      border-radius: 0 7px 7px 0;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .risk-low,
+    .risk-mid,
+    .risk-high {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .risk-low {
+      color: #31591c;
+      background: #edf7e8;
+    }
+
+    .risk-mid {
+      color: #79500d;
+      background: #fff3dd;
+    }
+
+    .risk-high {
+      color: #853026;
+      background: #ffe9e6;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 18px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .step-index {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #e7f1ed;
+      color: var(--teal-dark);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .step strong {
+      display: block;
+      line-height: 1.4;
+      margin-bottom: 2px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .resource-list {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .resource-list li {
+      border-left: 3px solid var(--teal);
+      padding-left: 10px;
+    }
+
+    .resource-list strong {
+      display: block;
+    }
+
+    .resource-list span {
+      color: var(--muted);
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #415047;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      padding: 12px 14px;
+      border-radius: 7px;
+      background: #193f39;
+      color: #fff;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 10;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .side-panel {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .button-row {
+        position: static;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .main-panel {
+        padding: 20px 16px 26px;
+      }
+
+      .workspace,
+      .metric-row {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .side-panel {
+        padding: 18px 14px;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row {
+        grid-template-columns: 1fr 40px 40px;
+      }
+
+      h1 {
+        font-size: 18px;
+      }
+    }
+
+    /* Visual refresh: calmer, denser, more like a real casework desk. */
+    :root {
+      --bg: #edf3f6;
+      --panel: #ffffff;
+      --panel-soft: #f6f9fb;
+      --ink: #17211f;
+      --muted: #63716d;
+      --line: #d9e4e7;
+      --teal: #0d7f78;
+      --teal-dark: #095f59;
+      --amber: #c68223;
+      --red: #c94d3f;
+      --green: #4a833f;
+      --focus: #8ecdc6;
+      --shadow: 0 18px 45px rgba(24, 48, 49, 0.1);
+      --shadow-soft: 0 8px 24px rgba(24, 48, 49, 0.07);
+      --radius: 8px;
+    }
+
+    body {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(237, 243, 246, 0.98) 48%, #edf3f6 100%),
+        linear-gradient(135deg, rgba(13, 127, 120, 0.08), transparent 32%),
+        linear-gradient(315deg, rgba(201, 77, 63, 0.07), transparent 38%),
+        repeating-linear-gradient(90deg, rgba(23, 33, 31, 0.025) 0 1px, transparent 1px 56px);
+    }
+
+    .app-shell {
+      grid-template-columns: minmax(360px, 420px) minmax(0, 1fr);
+    }
+
+    .side-panel {
+      padding: 0;
+      background: rgba(251, 253, 253, 0.94);
+      border-right: 1px solid rgba(18, 52, 50, 0.12);
+      box-shadow: 12px 0 35px rgba(24, 48, 49, 0.05);
+    }
+
+    .brand {
+      position: relative;
+      align-items: center;
+      padding: 25px 26px;
+      border-bottom: 0;
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 46%),
+        linear-gradient(120deg, #103c39 0%, #0d635d 72%, #0f7f71 100%);
+      overflow: hidden;
+    }
+
+    .brand::after {
+      content: "";
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.06));
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 12px 26px rgba(5, 28, 25, 0.18);
+    }
+
+    .brand h1 {
+      color: #fff;
+      font-size: 21px;
+      font-weight: 850;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.76);
+      max-width: 286px;
+      font-size: 12.5px;
+    }
+
+    #caseForm {
+      padding: 22px 24px 24px;
+    }
+
+    .form-section {
+      margin-top: 0;
+      margin-bottom: 24px;
+    }
+
+    .form-section + .form-section {
+      padding-top: 20px;
+      border-top: 1px solid rgba(18, 52, 50, 0.1);
+    }
+
+    .section-title {
+      margin-bottom: 14px;
+    }
+
+    .section-title h2 {
+      color: #17211f;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .section-kicker {
+      min-height: 24px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: #edf5f5;
+      color: #47706c;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .field-grid {
+      gap: 12px;
+    }
+
+    .field {
+      gap: 7px;
+      margin-bottom: 13px;
+      min-width: 0;
+    }
+
+    label {
+      color: #3f4d4a;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    input,
+    select,
+    textarea {
+      border-color: #d6e2e5;
+      background: #f8fbfc;
+      color: #17211f;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
+    }
+
+    input,
+    select {
+      height: 43px;
+    }
+
+    select {
+      appearance: none;
+      padding-right: 42px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #57706d 50%),
+        linear-gradient(135deg, #57706d 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) 18px,
+        calc(100% - 12px) 18px;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    input[type="number"] {
+      appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      margin: 0;
+      appearance: none;
+    }
+
+    textarea {
+      min-height: 104px;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #8a9996;
+    }
+
+    input:hover,
+    select:hover,
+    textarea:hover {
+      border-color: #bdcdd1;
+      background: #fff;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--teal);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(142, 205, 198, 0.3);
+    }
+
+    .button-row {
+      grid-template-columns: 1fr 44px 44px;
+      gap: 10px;
+      margin: 2px -4px 0;
+      padding: 14px 4px 2px;
+      background: linear-gradient(180deg, rgba(251, 253, 253, 0), rgba(251, 253, 253, 0.94) 36%);
+    }
+
+    .primary-btn,
+    .icon-btn,
+    .ghost-btn,
+    .copy-btn,
+    .tab-btn,
+    .chip {
+      border-radius: 8px;
+    }
+
+    .primary-btn {
+      min-height: 44px;
+      background: linear-gradient(135deg, #0e827b, #0a655f);
+      box-shadow: 0 13px 24px rgba(13, 127, 120, 0.23);
+    }
+
+    .primary-btn:hover {
+      background: linear-gradient(135deg, #0b716b, #094f4b);
+    }
+
+    .icon-btn,
+    .ghost-btn,
+    .copy-btn {
+      border-color: #d6e2e5;
+      background: #fff;
+    }
+
+    .icon-btn {
+      min-height: 44px;
+      color: #365551;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .main-panel {
+      padding: 24px 28px 36px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0)),
+        transparent;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 5;
+      margin-bottom: 18px;
+      padding: 12px;
+      border: 1px solid rgba(22, 45, 46, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 14px 34px rgba(24, 48, 49, 0.08);
+      backdrop-filter: blur(14px);
+    }
+
+    .status-line {
+      color: #51605c;
+      font-weight: 650;
+    }
+
+    .status-pill {
+      min-height: 32px;
+      border-color: transparent;
+      background: #ebf5f4;
+      color: #0b675f;
+      font-weight: 850;
+    }
+
+    .dot {
+      background: #20a67a;
+      box-shadow: 0 0 0 4px rgba(32, 166, 122, 0.12);
+    }
+
+    .view-tabs {
+      flex-wrap: nowrap;
+      padding: 3px;
+      border: 1px solid #dce7ea;
+      border-radius: 999px;
+      background: #f5f9fa;
+    }
+
+    .tab-btn {
+      min-height: 34px;
+      padding: 0 13px;
+      border: 0;
+      background: transparent;
+      color: #54635f;
+      box-shadow: none;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: #103c39;
+      color: #fff;
+      border-color: #103c39;
+      box-shadow: 0 8px 18px rgba(16, 60, 57, 0.18);
+    }
+
+    .workspace {
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+      gap: 18px;
+    }
+
+    .output-column,
+    .helper-column {
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+      border: 1px solid rgba(21, 48, 49, 0.1);
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--teal), rgba(198, 130, 35, 0.86), rgba(201, 77, 63, 0.78));
+    }
+
+    .card-header {
+      min-height: 58px;
+      padding: 16px 18px 10px;
+      border-bottom: 0;
+      background: transparent;
+    }
+
+    .card-header h3 {
+      color: #17211f;
+      font-size: 16px;
+      font-weight: 850;
+    }
+
+    .copy-btn {
+      min-height: 34px;
+      padding: 0 11px;
+      color: #335451;
+      font-size: 12px;
+      box-shadow: none;
+    }
+
+    .card-body {
+      padding: 0 18px 18px;
+      color: #2c3835;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .draft-block {
+      padding: 14px;
+      border: 1px solid #e1e9ec;
+      border-radius: 8px;
+      background: #f8fbfc;
+      color: #273331;
+      line-height: 1.8;
+    }
+
+    .empty-state {
+      min-height: 460px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 252, 0.96));
+      box-shadow: 0 20px 50px rgba(24, 48, 49, 0.09);
+    }
+
+    .empty-visual {
+      width: min(100%, 430px);
+      aspect-ratio: 16 / 8;
+      margin-bottom: 24px;
+      border: 1px solid #dce8eb;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 250, 251, 0.92)),
+        repeating-linear-gradient(0deg, rgba(13, 127, 120, 0.07) 0 1px, transparent 1px 36px),
+        repeating-linear-gradient(90deg, rgba(201, 77, 63, 0.06) 0 1px, transparent 1px 78px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .empty-visual::before {
+      left: 14%;
+      width: 72%;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0d7f78, #c68223, #c94d3f);
+    }
+
+    .empty-visual span {
+      width: 42px;
+      height: 42px;
+      border-width: 4px;
+      box-shadow: 0 12px 24px rgba(24, 48, 49, 0.16);
+    }
+
+    .empty-visual.photo-frame {
+      aspect-ratio: 16 / 8.6;
+      background: #eef5f6;
+      overflow: hidden;
+    }
+
+    .empty-visual.photo-frame::before {
+      content: none;
+    }
+
+    .empty-visual.photo-frame img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(0.92) contrast(0.96);
+    }
+
+    .empty-state h2 {
+      font-size: 22px;
+      font-weight: 850;
+    }
+
+    .empty-state p {
+      max-width: 520px;
+      margin: 0 auto;
+      color: #687773;
+      line-height: 1.7;
+    }
+
+    .note {
+      border-left-color: var(--amber);
+      background: #fff8ed;
+      color: #6f4a14;
+    }
+
+    .metric-row {
+      gap: 9px;
+    }
+
+    .metric {
+      min-height: 86px;
+      border-color: #dfe9ec;
+      background: linear-gradient(180deg, #fff, #f7fbfb);
+    }
+
+    .metric b {
+      color: #17211f;
+      font-size: 17px;
+    }
+
+    .steps {
+      gap: 12px;
+    }
+
+    .step {
+      padding: 12px;
+      border: 1px solid #e0e9ec;
+      border-radius: 8px;
+      background: #f8fbfc;
+    }
+
+    .step-index {
+      background: #e6f5f3;
+      color: #09635d;
+    }
+
+    .resource-list {
+      gap: 11px;
+    }
+
+    .resource-photo {
+      margin: 0 0 14px;
+      border: 1px solid #dfe9ec;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #eef5f6;
+      aspect-ratio: 16 / 7.4;
+    }
+
+    .resource-photo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(0.9) contrast(0.97);
+    }
+
+    .resource-list li {
+      padding: 11px 12px;
+      border: 1px solid #e0e9ec;
+      border-left: 4px solid var(--teal);
+      border-radius: 8px;
+      background: #f8fbfc;
+    }
+
+    .chip {
+      border-color: #dbe7e9;
+      background: #f4f8f9;
+      color: #3a5350;
+    }
+
+    .toast {
+      background: #103c39;
+      box-shadow: 0 18px 45px rgba(16, 60, 57, 0.24);
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .side-panel {
+        border-right: 0;
+        box-shadow: none;
+      }
+
+      #caseForm {
+        padding: 20px 18px 22px;
+      }
+
+      .topbar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .main-panel {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .side-panel {
+        padding: 0;
+      }
+
+      .brand {
+        padding: 20px 16px;
+      }
+
+      #caseForm {
+        padding: 18px 14px 20px;
+      }
+
+      .view-tabs {
+        flex-wrap: wrap;
+        border-radius: 8px;
+      }
+
+      .tab-btn {
+        flex: 1 1 calc(50% - 5px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="side-panel">
+      <header class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          <h1>AI社工个案咨询辅助助手</h1>
+          <p class="subtitle">面向一线社工与社区服务人员的轻量化智能工具，辅助个案整理、服务流程梳理、政策解读、心理支持和资源对接。</p>
+        </div>
+      </header>
+
+      <form id="caseForm">
+        <section class="form-section">
+          <div class="section-title">
+            <h2>个案基本资料</h2>
+            <span class="section-kicker">必填尽量补齐</span>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="clientName">姓名或编号</label>
+              <input id="clientName" name="clientName" placeholder="如：王阿姨 / A202605">
+            </div>
+            <div class="field">
+              <label for="age">年龄</label>
+              <input id="age" name="age" type="number" min="0" max="120" placeholder="如：72">
+            </div>
+            <div class="field">
+              <label for="gender">性别</label>
+              <select id="gender" name="gender">
+                <option value="">未填写</option>
+                <option>女</option>
+                <option>男</option>
+                <option>其他/不便透露</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="problemType">主要问题</label>
+              <select id="problemType" name="problemType">
+                <option>老年照护</option>
+                <option>困境儿童</option>
+                <option>残障支持</option>
+                <option>家庭矛盾</option>
+                <option>就业与救助</option>
+                <option>心理压力</option>
+                <option>住房与医疗</option>
+                <option>其他综合困难</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="riskLevel">风险等级</label>
+              <select id="riskLevel" name="riskLevel">
+                <option value="low">低风险</option>
+                <option value="mid">中风险</option>
+                <option value="high">高风险/需重点跟进</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="scene">咨询场景</label>
+              <select id="scene" name="scene">
+                <option>常规咨询</option>
+                <option>危机干预</option>
+                <option>资源引导</option>
+                <option>入户探访</option>
+                <option>报告撰写</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">
+            <h2>需求与服务信息</h2>
+            <span class="section-kicker">用于生成建议</span>
+          </div>
+          <div class="field">
+            <label for="currentIssue">当前情况</label>
+            <textarea id="currentIssue" name="currentIssue" placeholder="描述服务对象当前困难、情绪状态、家庭/社区支持情况等"></textarea>
+          </div>
+          <div class="field">
+            <label for="serviceHistory">既往服务记录</label>
+            <textarea id="serviceHistory" name="serviceHistory" placeholder="如：曾申请临时救助；社区志愿者每周探访一次；家属沟通不稳定"></textarea>
+          </div>
+          <div class="field">
+            <label for="needs">服务对象主要诉求</label>
+            <textarea id="needs" name="needs" placeholder="如：经济救助、照护资源、心理支持、就医陪伴、法律咨询等"></textarea>
+          </div>
+          <div class="field">
+            <label for="availableResources">已掌握资源</label>
+            <textarea id="availableResources" name="availableResources" placeholder="如：居委会、街道社工站、社区卫生服务中心、公益组织等"></textarea>
+          </div>
+        </section>
+
+        <div class="button-row" aria-label="操作">
+          <button class="primary-btn" type="submit"><span class="icon spark" aria-hidden="true"></span>生成草稿</button>
+          <button class="icon-btn" type="button" id="loadSample" aria-label="填充示例" title="填充示例"><span class="icon sample" aria-hidden="true"></span></button>
+          <button class="icon-btn" type="reset" aria-label="重置表单" title="重置表单"><span class="icon refresh" aria-hidden="true"></span></button>
+        </div>
+      </form>
+    </aside>
+
+    <main class="main-panel">
+      <div class="topbar">
+        <div class="status-line">
+          <span class="status-pill"><span class="dot" aria-hidden="true"></span>本地原型</span>
+          <span id="caseStatus">尚未生成个案内容</span>
+        </div>
+        <nav class="view-tabs" aria-label="输出视图">
+          <button class="tab-btn active" type="button" data-view="all">全部</button>
+          <button class="tab-btn" type="button" data-view="case">个案整理</button>
+          <button class="tab-btn" type="button" data-view="service">服务建议</button>
+          <button class="tab-btn" type="button" data-view="report">报告草稿</button>
+        </nav>
+      </div>
+
+      <section id="emptyState" class="card empty-state">
+        <div>
+          <div class="empty-visual photo-frame">
+            <img src="assets/case-desk.png" alt="社工整理个案资料的办公桌场景">
+          </div>
+          <h2>把零散个案信息整理成可执行服务方案</h2>
+          <p>快速生成个案摘要、服务建议、资源对接指引和文书草稿，帮助社工减少重复整理，把时间留给真实服务。</p>
+        </div>
+      </section>
+
+      <section id="workspace" class="workspace" hidden>
+        <div class="output-column">
+          <article class="card output-card" data-group="case">
+            <div class="card-header">
+              <h3>个案摘要</h3>
+              <button class="copy-btn" type="button" data-copy="summaryText"><span class="icon copy" aria-hidden="true"></span>复制</button>
+            </div>
+            <div class="card-body draft-block" id="summaryText"></div>
+          </article>
+
+          <article class="card output-card" data-group="service">
+            <div class="card-header">
+              <h3>服务流程与干预建议</h3>
+              <button class="copy-btn" type="button" data-copy="flowText"><span class="icon copy" aria-hidden="true"></span>复制</button>
+            </div>
+            <div class="card-body" id="flowText"></div>
+          </article>
+
+          <article class="card output-card" data-group="service">
+            <div class="card-header">
+              <h3>心理支持话术参考</h3>
+              <button class="copy-btn" type="button" data-copy="scriptText"><span class="icon copy" aria-hidden="true"></span>复制</button>
+            </div>
+            <div class="card-body draft-block" id="scriptText"></div>
+          </article>
+
+          <article class="card output-card" data-group="report">
+            <div class="card-header">
+              <h3>服务记录/报告草稿</h3>
+              <button class="copy-btn" type="button" data-copy="reportText"><span class="icon copy" aria-hidden="true"></span>复制</button>
+            </div>
+            <div class="card-body draft-block" id="reportText"></div>
+          </article>
+        </div>
+
+        <aside class="helper-column">
+          <article class="card output-card" data-group="case">
+            <div class="card-header">
+              <h3>问题分类与优先级</h3>
+            </div>
+            <div class="card-body" id="priorityText"></div>
+          </article>
+
+          <article class="card output-card" data-group="service">
+            <div class="card-header">
+              <h3>政策解读与资源对接</h3>
+              <button class="copy-btn" type="button" data-copy="resourceText"><span class="icon copy" aria-hidden="true"></span>复制</button>
+            </div>
+            <div class="card-body" id="resourceText"></div>
+          </article>
+
+          <article class="card output-card" data-group="all">
+            <div class="card-header">
+              <h3>提醒事项</h3>
+            </div>
+            <div class="card-body">
+              <div class="note"><span class="icon warn" aria-hidden="true"></span> 本工具用于提升个案整理、服务记录和资源匹配效率，不替代社工专业判断、医疗诊断、法律意见或当地主管部门的正式政策口径。</div>
+            </div>
+          </article>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite">已复制</div>
+
+  <script>
+    const form = document.querySelector("#caseForm");
+    const emptyState = document.querySelector("#emptyState");
+    const workspace = document.querySelector("#workspace");
+    const caseStatus = document.querySelector("#caseStatus");
+    const toast = document.querySelector("#toast");
+    const tabButtons = document.querySelectorAll(".tab-btn");
+
+    const policyMap = {
+      "老年照护": [
+        ["养老服务评估", "建议核对本地老年人能力评估、居家养老服务补贴、助餐助浴助洁等服务入口。"],
+        ["社区卫生服务", "可联动家庭医生、慢病随访、康复护理和转介陪诊资源。"],
+        ["长期照护资源", "如存在失能或照护缺口，建议评估长护险、日间照料中心、喘息服务等选项。"]
+      ],
+      "困境儿童": [
+        ["儿童福利与保护", "关注监护缺失、教育中断、家庭暴力、严重忽视等风险，必要时启动强制报告和未成年人保护联动。"],
+        ["学校与社区协同", "可对接班主任、学校社工、社区儿童主任和困境儿童保障政策。"],
+        ["心理与家庭支持", "建议采用儿童友好沟通，必要时转介专业心理服务。"]
+      ],
+      "残障支持": [
+        ["残疾人证与补贴", "核对残疾人证办理、困难残疾人生活补贴、重度残疾人护理补贴等条件。"],
+        ["康复与辅具", "可对接残联、康复机构、辅助器具适配和无障碍改造资源。"],
+        ["就业与托养", "结合能力评估，了解辅助性就业、日间照料、托养服务等路径。"]
+      ],
+      "家庭矛盾": [
+        ["家庭关系调适", "先做安全评估，再考虑家庭会议、调解服务、妇联或社区法律咨询。"],
+        ["反家暴保护", "如涉及暴力威胁，应优先保护人身安全，必要时协助报警、伤情记录和保护令咨询。"],
+        ["情绪支持", "以稳定情绪、澄清需求、分阶段沟通为主，避免过早判断责任归属。"]
+      ],
+      "就业与救助": [
+        ["社会救助", "可核对低保、特困供养、临时救助、医疗救助、教育救助等本地申请条件。"],
+        ["就业服务", "对接公共就业服务、技能培训、公益岗位、零工市场或就业援助。"],
+        ["慈善帮扶", "根据紧急程度补充公益基金、社区互助、物资帮扶等短期支持。"]
+      ],
+      "心理压力": [
+        ["心理筛查", "初步识别睡眠、食欲、情绪、冲动行为和自伤他伤风险。"],
+        ["专业转介", "中高风险需转介精神卫生中心、心理热线或持证心理咨询资源。"],
+        ["支持网络", "动员可信亲友、邻里、志愿者和社区工作人员建立陪伴计划。"]
+      ],
+      "住房与医疗": [
+        ["医疗保障", "核对医保待遇、门诊慢特病、医疗救助、慈善援助和费用减免。"],
+        ["住房支持", "了解公租房、住房困难帮扶、临时安置和安全隐患排查路径。"],
+        ["就医协助", "可对接社区卫生服务中心、陪诊志愿者、转诊协助和康复资源。"]
+      ],
+      "其他综合困难": [
+        ["综合评估", "建议按经济、健康、照护、心理、家庭关系、居住安全六类逐项梳理。"],
+        ["多方会商", "可邀请居委会、街道、社工站、卫生、司法、民政等共同研判。"],
+        ["阶段目标", "先处理安全和生计问题，再推进能力恢复与社会支持。"]
+      ]
+    };
+
+    const sceneScripts = {
+      "常规咨询": [
+        "我先把您刚才提到的情况整理一下，看看哪些事情最着急，哪些可以分步骤处理。",
+        "您愿意讲到这里已经很不容易了。接下来我们会一起确认可用资源，不会让您一个人面对。",
+        "为了后续服务更准确，我会再问几个具体问题，您可以选择方便回答的部分。"
+      ],
+      "危机干预": [
+        "现在最重要的是确认您和身边人的安全。我们先一起看看此刻是否有立即危险。",
+        "如果您担心自己会伤害自己或他人，请先不要独处，我会协助您联系可信家属、社区人员或紧急服务。",
+        "您不需要一次说完所有事情，我们先处理接下来半小时最关键的一步。"
+      ],
+      "资源引导": [
+        "我会把可申请的资源按紧急程度列出来，并说明需要准备哪些材料。",
+        "有些政策需要以街道或主管部门审核为准，我们可以先做条件核对，再协助您咨询窗口。",
+        "如果您愿意，我们可以一起确定第一位联系人和最早可办理的时间。"
+      ],
+      "入户探访": [
+        "今天来访主要是了解您的生活状态和实际需要，您可以带我们看一下最影响生活的地方。",
+        "我会记录您认可的信息，涉及隐私的内容会按工作规范保护。",
+        "探访结束前，我们会一起确认后续跟进事项和联系方式。"
+      ],
+      "报告撰写": [
+        "我会把已核实事实、服务对象表达、社工观察和后续计划分开记录，便于存档。",
+        "报告里会尽量使用客观描述，避免未经核实的判断。",
+        "如果后续有新增材料，可以再补充进服务记录。"
+      ]
+    };
+
+    const riskCopy = {
+      low: {
+        label: "低风险",
+        className: "risk-low",
+        priority: "可按常规服务流程跟进，重点做好需求确认、资源匹配和定期回访。",
+        cadence: "建议 7-14 天内回访一次"
+      },
+      mid: {
+        label: "中风险",
+        className: "risk-mid",
+        priority: "建议提高跟进频率，确认家庭/社区支持人，必要时发起跨部门协同。",
+        cadence: "建议 3-7 天内回访一次"
+      },
+      high: {
+        label: "高风险/需重点跟进",
+        className: "risk-high",
+        priority: "优先处理人身安全、基本生活、医疗或重大权益风险，必要时启动应急响应和专业转介。",
+        cadence: "建议 24-48 小时内跟进"
+      }
+    };
+
+    function fieldValue(name) {
+      return new FormData(form).get(name)?.toString().trim() || "";
+    }
+
+    function normalizeText(value, fallback) {
+      return value && value.length ? value : fallback;
+    }
+
+    function getCaseData() {
+      return {
+        clientName: normalizeText(fieldValue("clientName"), "未命名个案"),
+        age: normalizeText(fieldValue("age"), "未填写"),
+        gender: normalizeText(fieldValue("gender"), "未填写"),
+        problemType: fieldValue("problemType") || "其他综合困难",
+        riskLevel: fieldValue("riskLevel") || "low",
+        scene: fieldValue("scene") || "常规咨询",
+        currentIssue: normalizeText(fieldValue("currentIssue"), "尚未补充当前情况"),
+        serviceHistory: normalizeText(fieldValue("serviceHistory"), "暂无既往服务记录"),
+        needs: normalizeText(fieldValue("needs"), "尚未明确服务诉求"),
+        availableResources: normalizeText(fieldValue("availableResources"), "尚未登记可用资源")
+      };
+    }
+
+    function buildSummary(data) {
+      const risk = riskCopy[data.riskLevel];
+      return [
+        `服务对象：${data.clientName}，${data.gender}，${data.age}岁。`,
+        `主要问题：${data.problemType}；当前风险：${risk.label}。`,
+        `当前情况：${data.currentIssue}`,
+        `既往服务：${data.serviceHistory}`,
+        `主要诉求：${data.needs}`,
+        `已掌握资源：${data.availableResources}`,
+        `初步判断：该个案适合以“需求核实 -> 风险评估 -> 资源匹配 -> 阶段跟进”的方式推进。`
+      ].join("\n");
+    }
+
+    function buildPriority(data) {
+      const risk = riskCopy[data.riskLevel];
+      const urgentTags = data.riskLevel === "high"
+        ? ["安全确认", "应急联动", "专业转介"]
+        : data.riskLevel === "mid"
+          ? ["需求核实", "支持网络", "跨方协同"]
+          : ["资料完善", "资源匹配", "定期回访"];
+
+      return `
+        <div class="metric-row" aria-label="优先级指标">
+          <div class="metric"><b>${risk.label}</b><span>风险等级</span></div>
+          <div class="metric"><b>${data.problemType}</b><span>问题分类</span></div>
+          <div class="metric"><b>${risk.cadence}</b><span>跟进频率</span></div>
+        </div>
+        <p><span class="${risk.className}">${risk.label}</span></p>
+        <p>${risk.priority}</p>
+        <div class="chip-row">${urgentTags.map(tag => `<span class="chip">${tag}</span>`).join("")}</div>
+      `;
+    }
+
+    function buildFlow(data) {
+      const risk = riskCopy[data.riskLevel];
+      const firstStep = data.riskLevel === "high"
+        ? "立即确认服务对象及相关人员安全，记录风险事实，必要时联系紧急服务、社区负责人或专业机构。"
+        : "补齐基本资料，确认服务对象授权范围，区分已核实事实、主观陈述和社工观察。";
+
+      const steps = [
+        ["初始评估", firstStep],
+        ["问题拆解", `围绕${data.problemType}梳理经济、照护、健康、心理、家庭关系与社区支持情况。`],
+        ["资源匹配", "核对政策条件、服务机构、公益资源和社区支持人，形成可办理清单。"],
+        ["服务计划", "确定短期目标、责任人、时间节点和所需材料，避免一次性承诺无法落地的事项。"],
+        ["跟进复盘", `${risk.cadence}，记录变化、未解决问题和下一步转介/会商安排。`]
+      ];
+
+      return `<ol class="steps">${steps.map((step, index) => `
+        <li class="step">
+          <span class="step-index">${index + 1}</span>
+          <div><strong>${step[0]}</strong><p>${step[1]}</p></div>
+        </li>
+      `).join("")}</ol>`;
+    }
+
+    function buildResources(data) {
+      const resources = policyMap[data.problemType] || policyMap["其他综合困难"];
+      return `
+        <figure class="resource-photo">
+          <img src="assets/resource-map.png" alt="社区资源地图与服务对接讨论场景">
+        </figure>
+        <ul class="resource-list">
+          ${resources.map(item => `<li><strong>${item[0]}</strong><span>${item[1]}</span></li>`).join("")}
+        </ul>
+        <p class="note">政策办理条件、材料清单和补贴标准存在地区差异，请以当地民政、人社、卫健、残联、妇联、司法等部门最新口径为准。</p>
+      `;
+    }
+
+    function buildScript(data) {
+      const lines = sceneScripts[data.scene] || sceneScripts["常规咨询"];
+      return [
+        `场景：${data.scene}`,
+        "",
+        "开场稳定：",
+        `“${lines[0]}”`,
+        "",
+        "共情回应：",
+        `“${lines[1]}”`,
+        "",
+        "推进下一步：",
+        `“${lines[2]}”`,
+        "",
+        "边界说明：",
+        "“我会尽力协助您梳理资源和办理路径，但具体政策结果需要以主管部门审核为准。涉及医疗、法律或人身安全的问题，我们会及时联系相应专业力量。”"
+      ].join("\n");
+    }
+
+    function buildReport(data) {
+      const today = new Date().toLocaleDateString("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      });
+      const risk = riskCopy[data.riskLevel];
+      return [
+        "社工个案服务记录草稿",
+        "",
+        `记录日期：${today}`,
+        `服务对象：${data.clientName}`,
+        `基本情况：${data.gender}，${data.age}岁，主要议题为${data.problemType}。`,
+        "",
+        "一、服务对象陈述",
+        data.currentIssue,
+        "",
+        "二、既往服务与资源基础",
+        data.serviceHistory,
+        `已掌握/可尝试资源：${data.availableResources}`,
+        "",
+        "三、需求评估",
+        `服务对象当前主要诉求为：${data.needs}。初步风险等级为${risk.label}，${risk.priority}`,
+        "",
+        "四、服务计划",
+        "1. 完善个案资料，核实关键事实及服务对象授权。",
+        `2. 围绕${data.problemType}匹配政策、机构和社区资源，形成材料清单。`,
+        "3. 根据风险等级安排回访，并记录资源对接结果。",
+        "4. 如出现安全、医疗、法律等专业风险，及时转介或启动多方会商。",
+        "",
+        "五、待跟进事项",
+        `跟进频率：${risk.cadence}。`,
+        "待补充：身份证明、家庭经济状况、医疗/残障/就业材料、联系人信息及服务对象授权记录。"
+      ].join("\n");
+    }
+
+    function renderAll(data) {
+      document.querySelector("#summaryText").textContent = buildSummary(data);
+      document.querySelector("#priorityText").innerHTML = buildPriority(data);
+      document.querySelector("#flowText").innerHTML = buildFlow(data);
+      document.querySelector("#resourceText").innerHTML = buildResources(data);
+      document.querySelector("#scriptText").textContent = buildScript(data);
+      document.querySelector("#reportText").textContent = buildReport(data);
+      caseStatus.textContent = `已生成：${data.clientName} / ${data.problemType} / ${riskCopy[data.riskLevel].label}`;
+      emptyState.hidden = true;
+      workspace.hidden = false;
+      setView(document.querySelector(".tab-btn.active")?.dataset.view || "all");
+    }
+
+    function setView(view) {
+      tabButtons.forEach(button => button.classList.toggle("active", button.dataset.view === view));
+      document.querySelectorAll(".output-card").forEach(card => {
+        const group = card.dataset.group;
+        card.hidden = view !== "all" && group !== view && group !== "all";
+      });
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    async function copyText(id) {
+      const target = document.getElementById(id);
+      if (!target) return;
+      const text = target.innerText || target.textContent || "";
+      try {
+        await navigator.clipboard.writeText(text.trim());
+        showToast("已复制到剪贴板");
+      } catch (error) {
+        showToast("复制失败，请手动选择文本");
+      }
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      renderAll(getCaseData());
+    });
+
+    form.addEventListener("reset", () => {
+      window.setTimeout(() => {
+        emptyState.hidden = false;
+        workspace.hidden = true;
+        caseStatus.textContent = "尚未生成个案内容";
+      }, 0);
+    });
+
+    document.querySelector("#loadSample").addEventListener("click", () => {
+      const sample = {
+        clientName: "A20260516",
+        age: "72",
+        gender: "女",
+        problemType: "老年照护",
+        riskLevel: "mid",
+        scene: "入户探访",
+        currentIssue: "服务对象独居，近期因膝关节疼痛减少外出，买菜和就医不便。其子女在外地工作，邻里偶尔协助，但支持不稳定。服务对象表达焦虑，担心突发情况无人知晓。",
+        serviceHistory: "社区曾安排志愿者电话问候；去年申请过高龄津贴；暂无正式照护评估记录。",
+        needs: "希望获得助餐、就医陪伴、定期探访和适老化改造咨询。",
+        availableResources: "居委会、街道社工站、社区卫生服务中心、社区助餐点、志愿者队伍。"
+      };
+      Object.entries(sample).forEach(([key, value]) => {
+        const field = form.elements[key];
+        if (field) field.value = value;
+      });
+      renderAll(getCaseData());
+      showToast("已填充示例并生成");
+    });
+
+    document.querySelectorAll("[data-copy]").forEach(button => {
+      button.addEventListener("click", () => copyText(button.dataset.copy));
+    });
+
+    tabButtons.forEach(button => {
+      button.addEventListener("click", () => setView(button.dataset.view));
+    });
+  </script>
+</body>
+</html>

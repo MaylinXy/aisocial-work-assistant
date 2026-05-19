@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  WORKER
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum RiskLevel {
+  LOW
+  MID
+  HIGH
+}
+
+enum CaseStatus {
+  DRAFT
+  GENERATED
+  CLOSED
+}
+
+enum GenerationType {
+  FULL_REPORT
+}
+
+model User {
+  id           String       @id @default(cuid())
+  username     String       @unique
+  displayName  String
+  passwordHash String
+  role         Role         @default(WORKER)
+  status       UserStatus   @default(ACTIVE)
+  cases        CaseRecord[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([role])
+  @@index([status])
+}
+
+model CaseRecord {
+  id                 String         @id @default(cuid())
+  clientName         String
+  age                Int?
+  gender             String?
+  problemType        String
+  riskLevel          RiskLevel      @default(LOW)
+  scene              String
+  currentIssue       String         @db.Text
+  serviceHistory     String         @db.Text
+  needs              String         @db.Text
+  availableResources String?        @db.Text
+  status             CaseStatus     @default(DRAFT)
+  workerId           String
+  worker             User           @relation(fields: [workerId], references: [id], onDelete: Restrict)
+  generations        AiGeneration[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@index([workerId, createdAt])
+  @@index([problemType])
+  @@index([riskLevel])
+  @@index([status])
+}
+
+model AiGeneration {
+  id             String         @id @default(cuid())
+  caseId         String
+  case           CaseRecord     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  generationType GenerationType @default(FULL_REPORT)
+  inputSnapshot  Json
+  output         Json
+  rawOutput      String?        @db.Text
+  provider       String         @default("deepseek")
+  model          String
+  promptVersion  String         @default("v1")
+  tokenUsage     Json?
+  latencyMs      Int?
+  createdById    String?
+  createdAt      DateTime       @default(now())
+
+  @@index([caseId, createdAt])
+}
+
+model ResourceEntry {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  targetGroup String?
+  region      String?
+  description String   @db.Text
+  materials   String?  @db.Text
+  contact     String?
+  keywords    String?
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([region])
+  @@index([enabled])
+}
