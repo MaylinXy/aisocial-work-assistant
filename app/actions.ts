@@ -12,6 +12,7 @@ import {
   caseSchema,
   formDataToObject,
   loginSchema,
+  registerSchema,
   resourceSchema,
   userSchema
 } from "@/lib/validation";
@@ -35,6 +36,31 @@ export async function loginAction(formData: FormData) {
   if (!ok) {
     redirect(`/login?error=${encodeError("账号或密码错误")}`);
   }
+
+  await setSession(user);
+  redirect("/cases");
+}
+
+export async function registerAction(formData: FormData) {
+  const parsed = registerSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) {
+    redirect(`/register?error=${encodeError(parsed.error.issues[0]?.message || "注册信息校验失败")}`);
+  }
+
+  const existing = await prisma.user.findUnique({ where: { username: parsed.data.username } });
+  if (existing) {
+    redirect(`/register?error=${encodeError("这个账号已经被使用，请换一个")}`);
+  }
+
+  const passwordHash = await bcrypt.hash(parsed.data.password, 12);
+  const user = await prisma.user.create({
+    data: {
+      username: parsed.data.username,
+      displayName: parsed.data.displayName,
+      role: Role.WORKER,
+      passwordHash
+    }
+  });
 
   await setSession(user);
   redirect("/cases");

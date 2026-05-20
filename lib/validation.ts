@@ -23,6 +23,16 @@ export const loginSchema = z.object({
   password: z.string().min(1, "请输入密码")
 });
 
+export const registerSchema = z.object({
+  username: z.string().trim().min(3, "账号至少 3 位").max(40).regex(/^[a-zA-Z0-9_.-]+$/, "账号只能包含字母、数字、点、下划线和短横线"),
+  displayName: z.string().trim().min(1, "请填写姓名").max(60),
+  password: z.string().min(8, "密码至少 8 位").max(120),
+  confirmPassword: z.string().min(1, "请再次输入密码")
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "两次输入的密码不一致",
+  path: ["confirmPassword"]
+});
+
 export const caseSchema = z.object({
   clientName: z.string().trim().min(1, "请填写姓名或编号").max(80),
   age: optionalAge,

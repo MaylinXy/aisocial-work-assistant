@@ -58,7 +58,7 @@ img {
 .login-page {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 460px);
+  grid-template-columns: minmax(0, 1.1fr) minmax(340px, 440px);
   gap: 28px;
   align-items: center;
   padding: 32px;
@@ -122,17 +122,40 @@ img {
 }
 
 .login-card {
+  display: grid;
+  gap: 16px;
   padding: 30px;
 }
 
 .login-card h2 {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 28px;
 }
 
 .login-card p {
-  margin: 0 0 22px;
+  margin: 0;
   color: var(--muted);
+}
+
+.auth-form {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-form .primary-button {
+  justify-self: start;
+  margin-top: 2px;
+}
+
+.auth-switch {
+  padding-top: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.auth-switch a {
+  color: var(--teal-dark);
+  font-weight: 850;
 }
 
 .app-frame {
@@ -619,7 +642,7 @@ th {
 
   .login-visual,
   .login-visual img {
-    min-height: 420px;
+    min-height: 360px;
   }
 }
 
@@ -648,5 +671,30 @@ th {
   .case-row {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 560px) {
+  .login-page {
+    padding: 12px;
+  }
+
+  .login-card {
+    padding: 22px;
+  }
+
+  .login-visual,
+  .login-visual img {
+    min-height: 320px;
+  }
+
+  .login-visual > div {
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
+  }
+
+  .login-visual h1 {
+    font-size: 30px;
   }
 }

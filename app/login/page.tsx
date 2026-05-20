@@ -26,7 +26,7 @@ export default async function LoginPage({
         <h2>登录</h2>
         <p>请输入管理员或社工账号进入系统。</p>
         <Notice error={params.error ? decodeURIComponent(params.error) : undefined} />
-        <form action={loginAction}>
+        <form className="auth-form" action={loginAction}>
           <label>
             <span>账号</span>
             <input name="username" autoComplete="username" required />
@@ -37,6 +37,9 @@ export default async function LoginPage({
           </label>
           <button className="primary-button" type="submit">进入工作台</button>
         </form>
+        <p className="auth-switch">
+          还没有账号？<a href="/register">注册社工账号</a>
+        </p>
       </section>
     </main>
   );
