@@ -1,7 +1,7 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { Role, UserStatus } from "@prisma/client";
+import { Prisma, Role, UserStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { clearSession, requireAdmin, requireUser, setSession, canAccessCase } from "@/lib/auth";
@@ -99,13 +99,13 @@ export async function generateCaseAction(formData: FormData) {
     await prisma.aiGeneration.create({
       data: {
         caseId: id,
-        inputSnapshot: result.inputSnapshot,
-        output: result.output,
+        inputSnapshot: result.inputSnapshot as Prisma.InputJsonValue,
+        output: result.output as Prisma.InputJsonValue,
         rawOutput: result.rawOutput,
         provider: result.provider,
         model: result.model,
         promptVersion: result.promptVersion,
-        tokenUsage: result.tokenUsage || undefined,
+        tokenUsage: result.tokenUsage as Prisma.InputJsonValue | undefined,
         latencyMs: result.latencyMs,
         createdById: user.id
       }
