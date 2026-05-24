@@ -383,6 +383,12 @@ label span {
   font-weight: 850;
 }
 
+.field-help {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 input,
 select,
 textarea {
@@ -414,6 +420,11 @@ select {
   background-repeat: no-repeat;
 }
 
+select:hover,
+option:checked {
+  background-color: #fff;
+}
+
 textarea {
   min-height: 112px;
   padding: 11px;
@@ -432,6 +443,31 @@ textarea:focus {
 .form-actions {
   display: flex;
   justify-content: flex-end;
+}
+
+.draft-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #dce8e9;
+  border-radius: var(--radius);
+  background: #f2f8f8;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.draft-status button {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #cbdcdf;
+  border-radius: var(--radius);
+  color: #31504d;
+  background: #fff;
+  font-weight: 750;
 }
 
 .search-bar {
@@ -556,6 +592,29 @@ textarea:focus {
   line-height: 1.75;
 }
 
+.report-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.report-editor textarea {
+  min-height: 360px;
+  background: #fff;
+}
+
+.report-editor-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.report-editor-actions span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .resource-photo-small {
   margin-bottom: 14px;
   border: 1px solid #dfe9ec;
@@ -671,6 +730,17 @@ th {
   .case-row {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .draft-status,
+  .report-editor-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .draft-status button,
+  .report-editor-actions .secondary-button {
+    width: 100%;
   }
 }
 

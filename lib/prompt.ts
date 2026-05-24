@@ -32,7 +32,33 @@ export const aiOutputSchema = z.object({
 
 export type AiOutput = z.infer<typeof aiOutputSchema>;
 
-export const promptVersion = "v1";
+export const promptVersion = "v2";
+
+function scenarioGuidance(scene: string) {
+  if (scene.includes("危机")) {
+    return "危机干预场景：优先输出安全评估、紧急联系人核实、主管/专业机构转介、即时跟进计划；话术要短句、稳定情绪、避免承诺无法兑现事项。";
+  }
+  if (scene.includes("报告")) {
+    return "报告撰写场景：reportDraft 使用较正式的服务记录结构，包含基本情况、服务过程、评估要点、后续计划和人工核实事项；语言客观可归档。";
+  }
+  if (scene.includes("资源")) {
+    return "资源引导场景：重点说明资源匹配理由、对接步骤、所需材料和需核实信息；不得虚构政策名称、金额、电话或办理条件。";
+  }
+  if (scene.includes("入户")) {
+    return "入户探访场景：重点输出入户前准备、观察要点、沟通重点、风险记录和回访安排。";
+  }
+  return "常规咨询场景：重点输出信息梳理、情绪支持、服务目标确认、常规跟进计划和可执行话术。";
+}
+
+function riskGuidance(riskLevel: CaseRecord["riskLevel"]) {
+  if (riskLevel === "HIGH") {
+    return "高风险个案：强化安全确认、紧急处理流程、转介建议、跟进频率和责任分工；避免只给泛泛安慰。";
+  }
+  if (riskLevel === "MID") {
+    return "中风险个案：明确短期跟进节点、重点观察信号、资源连接进度和复评安排。";
+  }
+  return "低风险个案：侧重情绪支持、信息澄清、常规服务流程和自助/社区支持资源。";
+}
 
 export function buildCasePrompt(caseRecord: CaseRecord, resources: ResourceEntry[]) {
   const resourceText = resources.length
@@ -71,6 +97,10 @@ export function buildCasePrompt(caseRecord: CaseRecord, resources: ResourceEntry
 - 既往服务：${caseRecord.serviceHistory}
 - 主要诉求：${caseRecord.needs}
 - 已掌握资源：${caseRecord.availableResources || "未填写"}
+
+场景化生成要求：
+- ${scenarioGuidance(caseRecord.scene)}
+- ${riskGuidance(caseRecord.riskLevel)}
 
 后台资源库：
 ${resourceText}

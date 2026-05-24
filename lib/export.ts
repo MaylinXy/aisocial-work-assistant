@@ -30,6 +30,7 @@ function disclaimer() {
 
 function reportLines(caseRecord: CaseWithGeneration) {
   const output = latestOutput(caseRecord);
+  const reportDraft = caseRecord.reportDraftOverride || output?.reportDraft;
   return [
     "AI社工个案咨询辅助助手服务报告",
     "",
@@ -49,7 +50,7 @@ function reportLines(caseRecord: CaseWithGeneration) {
     `已掌握资源：${caseRecord.availableResources || "未填写"}`,
     "",
     "三、AI辅助生成结果",
-    output ? output.reportDraft : "尚未生成 AI 报告草稿。",
+    reportDraft || "尚未生成 AI 报告草稿。",
     "",
     "四、人工复核事项",
     output ? output.humanReviewNotes.map((note, index) => `${index + 1}. ${note}`).join("\n") : "生成前请由社工补充复核事项。",

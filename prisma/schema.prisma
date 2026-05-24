@@ -61,6 +61,7 @@ model CaseRecord {
   serviceHistory     String         @db.Text
   needs              String         @db.Text
   availableResources String?        @db.Text
+  reportDraftOverride String?       @db.Text
   status             CaseStatus     @default(DRAFT)
   workerId           String
   worker             User           @relation(fields: [workerId], references: [id], onDelete: Restrict)

@@ -46,6 +46,10 @@ export const caseSchema = z.object({
   availableResources: optionalText
 });
 
+export const reportDraftSchema = z.object({
+  reportDraft: z.string().trim().min(1, "报告草稿不能为空").max(12000, "报告草稿过长，请精简后保存")
+});
+
 export const resourceSchema = z.object({
   id: optionalText,
   title: z.string().trim().min(1, "请填写资源名称").max(120),

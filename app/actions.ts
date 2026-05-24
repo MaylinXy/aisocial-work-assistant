@@ -13,6 +13,7 @@ import {
   formDataToObject,
   loginSchema,
   registerSchema,
+  reportDraftSchema,
   resourceSchema,
   userSchema
 } from "@/lib/validation";
@@ -139,7 +140,7 @@ export async function generateCaseAction(formData: FormData) {
 
     await prisma.caseRecord.update({
       where: { id },
-      data: { status: "GENERATED" }
+      data: { status: "GENERATED", reportDraftOverride: null }
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "AI 生成失败";
@@ -148,6 +149,28 @@ export async function generateCaseAction(formData: FormData) {
 
   revalidatePath(`/cases/${id}`);
   redirect(`/cases/${id}?generated=1`);
+}
+
+export async function updateReportDraftAction(formData: FormData) {
+  const user = await requireUser();
+  const id = String(formData.get("id") || "");
+  const existing = await prisma.caseRecord.findUnique({ where: { id } });
+  if (!existing || !canAccessCase(user, existing.workerId)) {
+    redirect("/cases");
+  }
+
+  const parsed = reportDraftSchema.safeParse(formDataToObject(formData));
+  if (!parsed.success) {
+    redirect(`/cases/${id}?error=${encodeError(parsed.error.issues[0]?.message || "报告草稿保存失败")}`);
+  }
+
+  await prisma.caseRecord.update({
+    where: { id },
+    data: { reportDraftOverride: parsed.data.reportDraft }
+  });
+
+  revalidatePath(`/cases/${id}`);
+  redirect(`/cases/${id}?saved=report`);
 }
 
 export async function createResourceAction(formData: FormData) {

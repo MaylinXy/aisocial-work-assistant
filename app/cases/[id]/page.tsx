@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { generateCaseAction, updateCaseAction } from "@/app/actions";
+import { generateCaseAction, updateCaseAction, updateReportDraftAction } from "@/app/actions";
 import { AiOutputView } from "@/components/ai-output";
 import { AppShell } from "@/components/app-shell";
 import { CaseForm } from "@/components/case-form";
@@ -61,7 +61,7 @@ export default async function CaseDetailPage({
       </div>
       <Notice
         error={query.error ? decodeURIComponent(query.error) : undefined}
-        success={query.saved ? "个案已保存" : query.generated ? "AI 辅助内容已生成" : undefined}
+        success={query.saved === "report" ? "报告草稿已保存" : query.saved ? "个案已保存" : query.generated ? "AI 辅助内容已生成" : undefined}
       />
       <div className="detail-layout">
         <section>
@@ -71,7 +71,12 @@ export default async function CaseDetailPage({
         <section>
           <h3 className="section-title">AI 辅助输出</h3>
           {output ? (
-            <AiOutputView output={output} />
+            <AiOutputView
+              output={output}
+              caseId={caseRecord.id}
+              reportDraftOverride={caseRecord.reportDraftOverride}
+              saveReportDraftAction={updateReportDraftAction}
+            />
           ) : (
             <div className="empty-card">
               <img src="/assets/case-desk.png" alt="社工整理个案资料的办公桌场景" />
