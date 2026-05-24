@@ -2,7 +2,6 @@
   "name": "ai-social-work-assistant",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
