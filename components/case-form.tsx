@@ -56,7 +56,6 @@ export function CaseForm({
               </optgroup>
             ))}
           </select>
-          <small className="field-help">优先选择最贴近主诉的细分类型，综合困难可在“当前情况”补充多重问题。</small>
         </label>
         <label>
           <span>风险等级</span>
@@ -65,7 +64,6 @@ export function CaseForm({
             <option value={RiskLevel.MID}>中风险</option>
             <option value={RiskLevel.HIGH}>高风险/需重点跟进</option>
           </select>
-          <small className="field-help">低风险适合常规跟进；中风险需设定回访；高风险需优先核实安全、转介和紧急联系人。</small>
         </label>
         <label>
           <span>咨询场景</span>
@@ -74,8 +72,12 @@ export function CaseForm({
               <option key={item} value={item}>{item}</option>
             ))}
           </select>
-          <small className="field-help">“报告撰写”偏正式记录模板；“危机干预”会强化安全评估和紧急资源对接。</small>
         </label>
+      </div>
+      <div className="form-guidance" aria-label="关键选项说明">
+        <p><strong>主要问题：</strong>优先选择最贴近主诉的细分类型，综合困难可在“当前情况”补充多重问题。</p>
+        <p><strong>风险等级：</strong>低风险适合常规跟进；中风险需设定回访；高风险需优先核实安全、转介和紧急联系人。</p>
+        <p><strong>咨询场景：</strong>“报告撰写”偏正式记录模板；“危机干预”会强化安全评估和紧急资源对接。</p>
       </div>
       <label>
         <span>当前情况</span>
